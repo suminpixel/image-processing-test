@@ -4,6 +4,7 @@ from flask_cors import CORS, cross_origin
 import numpy
 import cv2
 import logging
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -28,12 +29,14 @@ class Detect(Resource):
             'file': file
         }
 
-
 @api.route('/api/detect')
 class DetectFace(Resource):
     def post(self):
         # picture = request.files['file']
         # print(picture)
+
+        # Log Time
+        function_start_time = time.time()
 
         # read image file string data
         picture = request.files['file'].read()
@@ -53,6 +56,9 @@ class DetectFace(Resource):
         # Load the cascade
         face_cascade = cv2.CascadeClassifier('./models/haarcascade_frontalface_default.xml')
 
+        # Log Time
+        detect_start_time = time.time()
+
         # Detect faces
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
 
@@ -63,11 +69,13 @@ class DetectFace(Resource):
             # cv2.imshow("face", faces)
             cv2.imwrite('./static/face.jpg', faces)
 
+        detect_time = time.time() - detect_start_time
+
         # Display the output
         cv2.imwrite('./static/detected.jpg', img)
 
-        return {'data' : 'ok'}
-
+        function_time = time.time() - function_start_time
+        return {'detect_time': detect_time, 'function_time': function_time}
 
 if __name__ == '__main__':
     app.run()
