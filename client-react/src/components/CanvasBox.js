@@ -7,6 +7,7 @@ const CanvasBox = ({fileInfo, setFileInfo}) => {
         <CanvasBoxWrapper>
             <Canvas id={'canvas-origin'}/>
             <Canvas id={'canvas-output'}/>
+            <Canvas id={'canvas-output-crop'}/>
         </CanvasBoxWrapper>
     );
 };
