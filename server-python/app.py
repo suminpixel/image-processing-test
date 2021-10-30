@@ -78,4 +78,4 @@ class DetectFace(Resource):
         return {'detect_time': detect_time, 'function_time': function_time}
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
