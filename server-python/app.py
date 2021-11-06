@@ -47,43 +47,41 @@ def face_detect(a):
     # Display the output
     cv2.imwrite('./static/detected.jpg', img)
 
-    return {'detect_time': detect_time  * 1000}
+    return detect_time
 
 @api.route('/hello')  # 데코레이터 이용, '/hello' 경로에 클래스 등록
 class HelloWorld(Resource):
     def get(self):  # GET 요청시 리턴 값에 해당 하는 dict를 JSON 형태로 반환
         return {"hello": "world!"}
 
-
-@api.route('/detect')
-class Detect(Resource):
-    def post(self):
-        global file
-        file = request.json.get('data')
-
-        return {
-            'file': file
-        }
-
 @api.route('/api/detect')
 class Detect(Resource):
     def post(self):
 
-        # normal file
-        function_start_time = time.time()
+        normal_time_list = []
+        pre_time_list = []
+
+        count = request.form['count']
         picture = request.files['file'].read()
-        normal_result = face_detect(picture)
-        function_time = time.time() - function_start_time
-        normal_result.update({'function_time': function_time * 1000})
+        pre_picture = request.files['pre_file'].read()
+
+        # normal file
+        for _ in range(int(count)):
+            normal_result = face_detect(picture)
+            normal_time_list.append(normal_result)
+
+        normal_avg = numpy.mean(normal_time_list) * 1000
+        normal_median = numpy.median(normal_time_list) * 1000
 
         # pre file
-        function_start_time = time.time()
-        picture = request.files['pre_file'].read()
-        pre_result = face_detect(picture)
-        function_time = time.time() - function_start_time
-        pre_result.update({'function_time': function_time * 1000})
+        for _ in range(int(count)):
+            pre_result = face_detect(pre_picture)
+            pre_time_list.append(pre_result)
 
-        return [ normal_result, pre_result ]
+        pre_avg = numpy.mean(pre_time_list) * 1000
+        pre_median = numpy.median(pre_time_list) * 1000
+
+        return [ {'Average': normal_avg , 'Median': normal_median }, {'Average': pre_avg , 'Median': pre_median } ]
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)

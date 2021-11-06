@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEffect } from "react";
 
-const ResultTable = ({ result }) => {
+const ResultTable = ({ result, preProcessingTime }) => {
   useEffect(() => {
     console.log(result);
   }, [result]);
@@ -12,9 +12,12 @@ const ResultTable = ({ result }) => {
       <tbody>
         <tr>
           <th></th>
-          <th>Only image server processing</th>
-          <th>Client-side pre-processing </th>
-          <th>Speed efficiency</th>
+          <th>Non-preprocessing case (server)</th>
+          <th>Preprocessing case (server)</th>
+          <th>pre-processing time</th>
+        </tr>
+        <tr>
+          <td>Convert Grayscale</td>
         </tr>
         <tr>
           <td>Face Detect</td>
@@ -27,11 +30,8 @@ const ResultTable = ({ result }) => {
           })}
           {result.length >= 2 && (
             <td>
-              {((result[0].detect_time - result[1].detect_time) /
-                result[0].detect_time) *
-                100}
-              <br />
-              <span>%</span>
+              {preProcessingTime / 10}
+              <br /> <span>ms</span>
             </td>
           )}
         </tr>
@@ -50,13 +50,10 @@ const ResultTableWrapper = styled.table`
     padding: 8px;
   }
 
-  td::first-line {
+  td:first-child {
     font-weight: bold;
     line-height: 1.6;
     color: #1c1d1f;
-  }
-
-  tr:nth-child(even) {
     background-color: #f2f2f2;
   }
 

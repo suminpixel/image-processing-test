@@ -10,6 +10,7 @@ const TestContainer = () => {
   const [fileInfo, setFileInfo] = useState(null); // { file, url, width, height }
 
   const [result, setResult] = useState([]); // { detect_time, function_time }[]
+  const [preProcessingTime, setPreprocessingTime] = useState(0); //ms
 
   return (
     <TestContainerWrapper>
@@ -20,8 +21,9 @@ const TestContainer = () => {
         setFileInfo={setFileInfo}
         setResult={setResult}
         result={result}
+        setPreprocessingTime={setPreprocessingTime}
       />
-      {result.length > 0 && <ResultTable result={result} />}
+      {result.length > 0 && <ResultTable result={result} preProcessingTime={preProcessingTime}/>}
       <CanvasBox fileInfo={fileInfo} setFileInfo={setFileInfo} />
     </TestContainerWrapper>
   );

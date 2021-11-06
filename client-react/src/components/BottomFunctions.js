@@ -13,24 +13,31 @@ const config = {
   },
 };
 
-const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult }) => {
+const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult, setPreprocessingTime }) => {
   const { cv } = useOpenCv();
-  const [preTime, setPretime] = useState({ pre_time: null });
-
-  const onTest = async () => {
+  const [count, setCount] = useState(200);
+  const [isLoading, setIsLoading] = useState(false);
+  const onTest = async (count) => {
     if (!cv) return;
+    if(count > 1000) return;
+
+    console.log(' ##### onTest : ', count);
+    setIsLoading(true);
     await startPreProcessing(cv);
     const cropCanvas = document.getElementById("canvas-output-crop");
     cropCanvas.toBlob((blob) => {
       const preTarget = new File([blob], "pre.png");
-      postImage(fileInfo.file, preTarget);
+      postImage(fileInfo.file, preTarget, count).then(
+          res =>  setIsLoading(false)
+      )
     });
   };
 
-  const postImage = async (target, preTarget) => {
+  const postImage = async (target, preTarget, count) => {
     const formData = new FormData();
     formData.append("file", target);
     formData.append("pre_file", preTarget);
+    formData.append("count", count);
     await axios
       .post(`${TEST_DOMAIN}/api/detect`, formData, config)
       .then((res) => {
@@ -44,6 +51,7 @@ const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult }) => {
   };
 
   const startPreProcessing = async (cv, beforeTime) => {
+    const start = Date.now();
     // let gray2 = new cv.Mat();
     const srcImg = document.getElementById("canvas-origin");
     let src = new cv.imread(srcImg);
@@ -84,6 +92,8 @@ const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult }) => {
       roiGray.delete();
       roiSrc.delete();
     }
+    const time = Date.now() - start; //ms
+    setPreprocessingTime(time);
 
     console.log("faces[0]", faces[0]);
     cv.imshow("canvas-output", src);
@@ -111,10 +121,12 @@ const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult }) => {
       >
         ▶️ PREPROCESSING IMAGE
       </button> */}
+      <span>Iteration</span>
+      <CountInput value={count} onChange={e => setCount(e.target.value)} />
       <button
         className={"button"}
-        onClick={onTest}
-        disabled={fileInfo === null}
+        onClick={()=>onTest(count)}
+        disabled={fileInfo === null || isLoading}
       >
         ▶️ BENCH TEST
       </button>
@@ -124,6 +136,11 @@ const BottomFunctions = ({ fileInfo, result, setFileInfo, setResult }) => {
 
 const BottomFunctionsWrapper = styled.div`
   margin: 12px 0;
+`;
+
+const CountInput = styled.input`
+  margin: 0 8px;
+  width: 80px;
 `;
 
 export default BottomFunctions;

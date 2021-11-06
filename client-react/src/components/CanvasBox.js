@@ -5,9 +5,9 @@ import styled from 'styled-components'
 const CanvasBox = ({fileInfo, setFileInfo}) => {
     return (
         <CanvasBoxWrapper>
-            <Canvas id={'canvas-origin'}/>
             <Canvas id={'canvas-output'}/>
-            <Canvas id={'canvas-output-crop'}/>
+            <Canvas id={'canvas-origin'} style={{ visibility: 'hidden'}} />
+            <Canvas id={'canvas-output-crop'} style={{ visibility: 'hidden'}}/>
         </CanvasBoxWrapper>
     );
 };
