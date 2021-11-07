@@ -14,7 +14,7 @@ const TestContainer = () => {
 
   return (
     <TestContainerWrapper>
-      <h2>TEST</h2>
+      <h2>Face Detect Test</h2>
       <Uploader fileInfo={fileInfo} setFileInfo={setFileInfo} />
       <BottomFunctions
         fileInfo={fileInfo}
@@ -23,7 +23,7 @@ const TestContainer = () => {
         result={result}
         setPreprocessingTime={setPreprocessingTime}
       />
-      {result.length > 0 && <ResultTable result={result} preProcessingTime={preProcessingTime}/>}
+      {result.length > 0 && <ResultTable title={'Face Detect'} result={result} preProcessingTime={preProcessingTime}/>}
       <CanvasBox fileInfo={fileInfo} setFileInfo={setFileInfo} />
     </TestContainerWrapper>
   );

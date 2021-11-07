@@ -2,25 +2,27 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEffect } from "react";
 
-const ResultTable = ({ result, preProcessingTime }) => {
+
+const ResultTable = ({ title, result, preProcessingTime }) => {
   useEffect(() => {
     console.log(result);
   }, [result]);
 
   return (
     <ResultTableWrapper>
+      <h4>Result : </h4>
       <tbody>
         <tr>
           <th></th>
-          <th>Non-preprocessing case (server)</th>
-          <th>Preprocessing case (server)</th>
-          <th>pre-processing time</th>
+          <th>Non-preprocessing case (Only server)</th>
+          <th>Preprocessing case</th>
+          <th>Only Client processing case</th>
         </tr>
         <tr>
           <td>Convert Grayscale</td>
         </tr>
         <tr>
-          <td>Face Detect</td>
+          <td>Client</td>
           {result.map((data, index) => {
             return (
               <td key={index}>
@@ -35,6 +37,9 @@ const ResultTable = ({ result, preProcessingTime }) => {
             </td>
           )}
         </tr>
+      <tr>
+        <td>Server</td>
+      </tr>
       </tbody>
     </ResultTableWrapper>
   );
@@ -67,6 +72,7 @@ const ResultTableWrapper = styled.table`
     text-align: center;
     background-color: #04aa6d;
     color: white;
+    word-break: break-all;
   }
 
   td {
