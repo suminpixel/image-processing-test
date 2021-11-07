@@ -10,7 +10,8 @@ const TestContainer = () => {
   const [fileInfo, setFileInfo] = useState(null); // { file, url, width, height }
 
   const [result, setResult] = useState([]); // { detect_time, function_time }[]
-  const [preProcessingTime, setPreprocessingTime] = useState(0); //ms
+  const [onlyClientTime, setOnlyClientTime] = useState(0); //ms
+  const [apiTime, setApiTime] = useState([]); //ms[]
 
   return (
     <TestContainerWrapper>
@@ -21,9 +22,17 @@ const TestContainer = () => {
         setFileInfo={setFileInfo}
         setResult={setResult}
         result={result}
-        setPreprocessingTime={setPreprocessingTime}
+        setOnlyClientTime={setOnlyClientTime}
+        setApiTime={setApiTime}
       />
-      {result.length > 0 && <ResultTable title={'Face Detect'} result={result} preProcessingTime={preProcessingTime}/>}
+
+      <ResultTable
+        title={"Face Detect"}
+        result={result}
+        onlyClientTime={onlyClientTime}
+        apiTime={apiTime}
+      />
+
       <CanvasBox fileInfo={fileInfo} setFileInfo={setFileInfo} />
     </TestContainerWrapper>
   );

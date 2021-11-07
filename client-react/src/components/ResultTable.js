@@ -2,8 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEffect } from "react";
 
-
-const ResultTable = ({ title, result, preProcessingTime }) => {
+const ResultTable = ({ title, result, onlyClientTime, apiTime }) => {
   useEffect(() => {
     console.log(result);
   }, [result]);
@@ -14,32 +13,26 @@ const ResultTable = ({ title, result, preProcessingTime }) => {
       <tbody>
         <tr>
           <th></th>
-          <th>Non-preprocessing case (Only server)</th>
+          <th>Non-preprocessing case</th>
           <th>Preprocessing case</th>
           <th>Only Client processing case</th>
         </tr>
         <tr>
-          <td>Convert Grayscale</td>
-        </tr>
-        <tr>
-          <td>Client</td>
+          {result.length > 0 && <td>Face Detection</td>}
           {result.map((data, index) => {
             return (
               <td key={index}>
-                {JSON.stringify(data)} <br /> <span>ms</span>
+                {JSON.stringify(data)} <br /> {apiTime[index]} <span>ms</span>
               </td>
             );
           })}
           {result.length >= 2 && (
             <td>
-              {preProcessingTime / 10}
+              {onlyClientTime}
               <br /> <span>ms</span>
             </td>
           )}
         </tr>
-      <tr>
-        <td>Server</td>
-      </tr>
       </tbody>
     </ResultTableWrapper>
   );

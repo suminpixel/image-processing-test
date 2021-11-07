@@ -13,6 +13,11 @@ CORS(app, resources={r'*': {'origins': '*'}})
 logging.basicConfig(level=logging.INFO)
 
 def face_detect(a):
+
+
+    # Log Time
+    detect_start_time = time.time()
+
     # print(picture)
     # convert string data to numpy array
     numpy_img_str = numpy.fromstring(a, numpy.uint8)
@@ -29,9 +34,6 @@ def face_detect(a):
     # Load the cascade
     face_cascade = cv2.CascadeClassifier('./models/haarcascade_frontalface_default.xml')
 
-    # Log Time
-    detect_start_time = time.time()
-
     # Detect faces
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
 
@@ -42,10 +44,11 @@ def face_detect(a):
         # cv2.imshow("face", faces)
         cv2.imwrite('./static/face.jpg', faces)
 
-    detect_time = time.time() - detect_start_time
 
     # Display the output
     cv2.imwrite('./static/detected.jpg', img)
+
+    detect_time = time.time() - detect_start_time
 
     return detect_time
 
@@ -82,6 +85,7 @@ class Detect(Resource):
         pre_median = numpy.median(pre_time_list) * 1000
 
         return [ {'Average': normal_avg , 'Median': normal_median }, {'Average': pre_avg , 'Median': pre_median } ]
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
