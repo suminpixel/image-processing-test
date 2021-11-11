@@ -104,7 +104,7 @@ class Detect(Resource):
         time_avg = numpy.mean(time_list) * 1000
         time_median = numpy.median(time_list) * 1000
 
-        return {'Average': time_avg , 'Median': time_median, 'Url': '/static/detected.jpg' }
+        return {'Average': time_avg , 'Median': time_median, 'Url': '/static/detected.jpg'}
 
 @api.route('/api/detect/face/pre')
 class Detect(Resource):
@@ -126,4 +126,4 @@ class Detect(Resource):
         return {'Average': time_avg , 'Median': time_median, 'Faces': faces }
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5002)

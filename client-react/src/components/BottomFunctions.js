@@ -20,10 +20,32 @@ const BottomFunctions = ({
   setResult,
   setOnlyClientTime,
   setApiTime,
+    setServerTime,
 }) => {
   const { cv } = useOpenCv();
   const [count, setCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+
+  const onBenchTest = async () => {
+    await onServerTest()
+  }
+  const onServerTest = async () => {
+    const start = Date.now();
+    const selectedFile = document.getElementById('input-image').files[0];
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("count", count);
+    await axios
+        .post(`${TEST_DOMAIN}/api/detect/face`, formData, config)
+        .then((res) => {
+          console.log("response", res.data);
+          const result = JSON.stringify({...res.data, totalTime: Date.now() - start}, null, 1);
+          setServerTime(result)
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+  }
 
   const onTest = async (count) => {
     if (!cv) return;
@@ -194,7 +216,7 @@ const BottomFunctions = ({
       <CountInput value={count} onChange={(e) => setCount(e.target.value)} />
       <button
         className={"button"}
-        onClick={() => onTest(count)}
+        onClick={onBenchTest}
         disabled={fileInfo === null || isLoading}
       >
         ▶️ BENCH TEST

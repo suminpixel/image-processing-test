@@ -4,7 +4,8 @@ import Uploader from "./Uploader";
 import BottomFunctions from "./BottomFunctions";
 import styled from "styled-components";
 import CanvasBox from "./CanvasBox";
-import ResultTable from "./ResultTable";
+import TestResultTable from "./TestResultTable";
+import {TEST_DOMAIN} from "../utils/constants";
 
 const TestContainer = () => {
   const [fileInfo, setFileInfo] = useState(null); // { file, url, width, height }
@@ -12,6 +13,8 @@ const TestContainer = () => {
   const [result, setResult] = useState([]); // { detect_time, function_time }[]
   const [onlyClientTime, setOnlyClientTime] = useState(0); //ms
   const [apiTime, setApiTime] = useState([]); //ms[]
+
+    const [serverTime, setServerTime] = useState();
 
   return (
     <TestContainerWrapper>
@@ -24,14 +27,18 @@ const TestContainer = () => {
         result={result}
         setOnlyClientTime={setOnlyClientTime}
         setApiTime={setApiTime}
+        setServerTime={setServerTime}
       />
-
-      <ResultTable
-        title={"Face Detect"}
-        result={result}
-        onlyClientTime={onlyClientTime}
-        apiTime={apiTime}
-      />
+        <TestResultTable serverTime={serverTime} />
+        <div>
+            { serverTime && <image src={`${TEST_DOMAIN}/static/detected.jpg`} style={{width: 1440}}/> }
+        </div>
+      {/*<ResultTable*/}
+      {/*  title={"Face Detect"}*/}
+      {/*  result={result}*/}
+      {/*  onlyClientTime={onlyClientTime}*/}
+      {/*  apiTime={apiTime}*/}
+      {/*/>*/}
 
       <CanvasBox fileInfo={fileInfo} setFileInfo={setFileInfo} />
     </TestContainerWrapper>
