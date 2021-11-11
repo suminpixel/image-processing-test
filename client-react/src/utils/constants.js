@@ -1,2 +1,2 @@
 export const SERVER_DOMAIN = "http://13.125.45.100:5000";
-export const TEST_DOMAIN = "http://192.168.0.2:5002";
+export const TEST_DOMAIN = "http://13.125.45.100:5002";
