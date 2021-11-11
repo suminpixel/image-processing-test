@@ -50,7 +50,7 @@ def face_detect(a):
 
     detect_time = time.time() - detect_start_time
 
-    return detect_time
+    return { 'time': detect_time, 'faces': faces}
 
 @api.route('/hello')  # 데코레이터 이용, '/hello' 경로에 클래스 등록
 class HelloWorld(Resource):
@@ -86,6 +86,44 @@ class Detect(Resource):
 
         return [ {'Average': normal_avg , 'Median': normal_median }, {'Average': pre_avg , 'Median': pre_median } ]
 
+
+@api.route('/api/detect/face')
+class Detect(Resource):
+    def post(self):
+
+        time_list = []
+
+        count = request.form['count']
+        picture = request.files['file'].read()
+
+        face_detect(picture)
+        for _ in range(int(count)):
+            normal_result = face_detect(picture)
+            time_list.append(normal_result['time'])
+
+        time_avg = numpy.mean(time_list) * 1000
+        time_median = numpy.median(time_list) * 1000
+
+        return {'Average': time_avg , 'Median': time_median, 'Url': '/static/detected.jpg' }
+
+@api.route('/api/detect/face/pre')
+class Detect(Resource):
+    def post(self):
+
+        time_list = []
+
+        count = request.form['count']
+        picture = request.files['file'].read()
+
+        faces = face_detect(picture)['faces']
+        for _ in range(int(count)):
+            normal_result = face_detect(picture)
+            time_list.append(normal_result['time'])
+
+        time_avg = numpy.mean(time_list) * 1000
+        time_median = numpy.median(time_list) * 1000
+
+        return {'Average': time_avg , 'Median': time_median, 'Faces': faces }
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
