@@ -12,9 +12,37 @@ CORS(app, resources={r'*': {'origins': '*'}})
 
 logging.basicConfig(level=logging.INFO)
 
+def pre_face_detect(a):
+    # Log Time
+    detect_start_time = time.time()
+
+    # print(picture)
+    # convert string data to numpy array
+    numpy_img_str = numpy.fromstring(a, numpy.uint8)
+    # convert numpy array to image
+    img = cv2.imdecode(numpy_img_str, cv2.IMREAD_UNCHANGED)
+    cv2.imwrite('./static/target.jpg', img)
+
+    # Read the input image
+    img = cv2.imread('./static/target.jpg')
+
+    # Convert into grayscale
+    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Load the cascade
+    face_cascade = cv2.CascadeClassifier('./models/haarcascade_frontalface_default.xml')
+
+    # Detect faces
+    faces = face_cascade.detectMultiScale(img, 1.1, 4)
+    logging.info(faces)
+
+    list_str = faces.tolist()
+
+    detect_time = time.time() - detect_start_time
+
+    return { 'time': detect_time, 'faces': list_str }
+
 def face_detect(a):
-
-
     # Log Time
     detect_start_time = time.time()
 
@@ -36,7 +64,7 @@ def face_detect(a):
 
     # Detect faces
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-
+    logging.info(faces)
     # Draw rectangle around the faces and crop the faces
     for (x, y, w, h) in faces:
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
@@ -48,9 +76,12 @@ def face_detect(a):
     # Display the output
     cv2.imwrite('./static/detected.jpg', img)
 
+    list_str = faces.tolist()
+
     detect_time = time.time() - detect_start_time
 
-    return { 'time': detect_time, 'faces': faces}
+    return { 'time': detect_time, 'faces': list_str }
+
 
 @api.route('/hello')  # 데코레이터 이용, '/hello' 경로에 클래스 등록
 class HelloWorld(Resource):
@@ -115,15 +146,16 @@ class Detect(Resource):
         count = request.form['count']
         picture = request.files['file'].read()
 
-        faces = face_detect(picture)['faces']
+        faces_result = pre_face_detect(picture)['faces']
+        logging.info(faces_result)
         for _ in range(int(count)):
-            normal_result = face_detect(picture)
+            normal_result = pre_face_detect(picture)
             time_list.append(normal_result['time'])
 
         time_avg = numpy.mean(time_list) * 1000
         time_median = numpy.median(time_list) * 1000
 
-        return {'Average': time_avg , 'Median': time_median, 'Faces': faces }
+        return {'Average': time_avg , 'Median': time_median, 'Faces': faces_result }
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)

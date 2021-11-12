@@ -6,6 +6,7 @@ const CanvasBox = ({fileInfo, setFileInfo}) => {
     return (
         <CanvasBoxWrapper>
             <Canvas id={'canvas-output'}/>
+            <Canvas id={'canvas-detected'}/>
             <Canvas id={'canvas-origin'} style={{ visibility: 'hidden'}} />
             <Canvas id={'canvas-output-crop'} style={{ visibility: 'hidden'}}/>
         </CanvasBoxWrapper>

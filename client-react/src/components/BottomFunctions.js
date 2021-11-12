@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { SERVER_DOMAIN, TEST_DOMAIN } from "../utils/constants";
+import { TEST_DOMAIN } from "../utils/constants";
 import { useOpenCv } from "opencv-react";
 //import faceModels from '../models/haarcascade_frontalface_default.xml'
 //import {detectFace} from "../utils/image-processing-manager";
@@ -21,14 +21,59 @@ const BottomFunctions = ({
   setOnlyClientTime,
   setApiTime,
     setServerTime,
+                           setPreTime,
+    setClientTime,
 }) => {
   const { cv } = useOpenCv();
   const [count, setCount] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const onBenchTest = async () => {
-    await onServerTest()
+    if(!cv) return alert('need cv')
+    await onServerTest().then(()=> onPreTest())
+
   }
+
+  const onPreTest = async () => {
+    const start = Date.now();
+    // let gray2 = new cv.Mat();
+    let src = cv.imread('canvas-origin');
+    let dst = new cv.Mat();
+    cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0);
+    cv.imshow('canvas-output', dst);
+    src.delete(); dst.delete();
+
+
+    const preProcessTime = Date.now() - start; //ms
+    const outputCanvas = document.getElementById("canvas-output");
+    outputCanvas.toBlob(async (blob) => {
+      const target = new File([blob], "pre.jpg");
+      const formData = new FormData();
+      formData.append("file", target);
+      formData.append("count", count);
+      await axios
+          .post(`${TEST_DOMAIN}/api/detect/face/pre`, formData, config)
+          .then(async (res) => {
+            console.log("response", res.data);
+            const faces = res.data['Faces'];
+            // await drawBox(res.data.Faces)
+            console.log(faces)
+            let targetFace;
+            for(var i=0; i<6; i++){
+              for(var j=0; j<6; j++){
+                targetFace = ''
+              }
+            }
+            const result = JSON.stringify({...res.data, totalTime: Date.now() - start ,preProcessTime: preProcessTime}, null, 1);
+            setPreTime(result)
+            clientDetect()
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+    });
+  }
+
   const onServerTest = async () => {
     const start = Date.now();
     const selectedFile = document.getElementById('input-image').files[0];
@@ -47,6 +92,42 @@ const BottomFunctions = ({
         });
   }
 
+  const drawBox = (faces) => {
+    const srcImg = document.getElementById("canvas-output");
+    let src = new cv.imread(srcImg);
+
+    let gray = new cv.Mat();
+
+    for (let i = 0; i < faces.size(); ++i) {
+      let roiGray = gray.roi(faces.get(i));
+      let roiSrc = src.roi(faces.get(i));
+      let point1 = new cv.Point(faces.get(i).x, faces.get(i).y);
+      let point2 = new cv.Point(
+          faces.get(i).x + faces.get(i).width,
+          faces.get(i).y + faces.get(i).height
+      );
+      cv.rectangle(src, point1, point2, [255, 0, 0, 255]);
+
+      if (i === 0) {
+        const rect = new cv.Rect(
+            faces.get(i).x,
+            faces.get(i).y,
+            faces.get(i).width,
+            faces.get(i).height
+        );
+        const dst = src.roi(rect);
+        cv.imshow("canvas-detected", dst);
+      }
+
+      roiGray.delete();
+      roiSrc.delete();
+    }
+
+    cv.imshow("canvas-detected", src);
+    src.delete();
+    gray.delete();
+  }
+
   const onTest = async (count) => {
     if (!cv) return;
     if (count > 1000) return;
@@ -58,7 +139,7 @@ const BottomFunctions = ({
     const cropCanvas = document.getElementById("canvas-output-crop");
     const start = Date.now();
     cropCanvas.toBlob((blob) => {
-      const preTarget = new File([blob], "pre.png");
+      const preTarget = new File([blob], "pre.jpg");
       postImage(fileInfo.file, preTarget, count).then((res) => {
         setIsLoading(false);
         setApiTime([
@@ -86,7 +167,8 @@ const BottomFunctions = ({
       });
   };
 
-  const setGrayScale = async (cv, beforeTime) => {
+  const clientDetect = async () => {
+    console.log('clientDetect')
     const start = Date.now();
     // let gray2 = new cv.Mat();
     const srcImg = document.getElementById("canvas-origin");
@@ -109,27 +191,28 @@ const BottomFunctions = ({
       let roiSrc = src.roi(faces.get(i));
       let point1 = new cv.Point(faces.get(i).x, faces.get(i).y);
       let point2 = new cv.Point(
-        faces.get(i).x + faces.get(i).width,
-        faces.get(i).y + faces.get(i).height
+          faces.get(i).x + faces.get(i).width,
+          faces.get(i).y + faces.get(i).height
       );
       cv.rectangle(src, point1, point2, [255, 0, 0, 255]);
 
-      if (i === 0) {
-        const rect = new cv.Rect(
-          faces.get(i).x,
-          faces.get(i).y,
-          faces.get(i).width,
-          faces.get(i).height
-        );
-        const dst = src.roi(rect);
-        cv.imshow("canvas-output-crop", dst);
-      }
+      // if (i === 0) {
+      //   const rect = new cv.Rect(
+      //       faces.get(i).x,
+      //       faces.get(i).y,
+      //       faces.get(i).width,
+      //       faces.get(i).height
+      //   );
+      //   const dst = src.roi(rect);
+      //   cv.imshow("canvas-output-crop", dst);
+      // }
 
       roiGray.delete();
       roiSrc.delete();
     }
     const time = Date.now() - start; //ms
-    setOnlyClientTime(time);
+    console.log(time)
+    setClientTime(time);
 
     console.log("faces[0]", faces[0]);
     cv.imshow("canvas-output", src);
@@ -140,6 +223,7 @@ const BottomFunctions = ({
     faces.delete();
     eyes.delete();
   };
+
 
   const startPreProcessing = async (cv, beforeTime) => {
     const start = Date.now();

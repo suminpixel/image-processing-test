@@ -13,8 +13,9 @@ const TestContainer = () => {
   const [result, setResult] = useState([]); // { detect_time, function_time }[]
   const [onlyClientTime, setOnlyClientTime] = useState(0); //ms
   const [apiTime, setApiTime] = useState([]); //ms[]
-
+    const [preTime, setPreTime] = useState(); //ms[]
     const [serverTime, setServerTime] = useState();
+    const [clientTime, setClientTime] = useState();
 
   return (
     <TestContainerWrapper>
@@ -28,11 +29,11 @@ const TestContainer = () => {
         setOnlyClientTime={setOnlyClientTime}
         setApiTime={setApiTime}
         setServerTime={setServerTime}
+        setPreTime={setPreTime}
+        setClientTime={setClientTime}
       />
-        <TestResultTable serverTime={serverTime} />
-        <div>
-            { serverTime && <image src={`${TEST_DOMAIN}/static/detected.jpg`} style={{width: 1440}}/> }
-        </div>
+        <TestResultTable serverTime={serverTime} preTime={preTime} clientTime={clientTime} />
+
       {/*<ResultTable*/}
       {/*  title={"Face Detect"}*/}
       {/*  result={result}*/}

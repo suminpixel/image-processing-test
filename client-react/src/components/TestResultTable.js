@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 import { useEffect } from "react";
 
-const TestResultTable = ({ serverTime, clientTime, preTime, jsTime  }) => {
+const TestResultTable = ({ serverTime, clientTime, preTime  }) => {
 
   return (
     <ResultTableWrapper>
@@ -13,14 +13,14 @@ const TestResultTable = ({ serverTime, clientTime, preTime, jsTime  }) => {
           <th>Non-preprocessing case</th>
           <th>Preprocessing case</th>
           <th>Only Client case (wasm)</th>
-          <th>Only Client case (js)</th>
+          {/*<th>Only Client case (js)</th>*/}
         </tr>
         <tr>
           <td>Face Detection</td>
           <td>{serverTime}</td>
-          <td>{clientTime}</td>
-          <td>{clientTime}</td>
           <td>{preTime}</td>
+          <td>{clientTime}</td>
+          {/*<td>{clientTime}</td>*/}
         </tr>
       </tbody>
     </ResultTableWrapper>
