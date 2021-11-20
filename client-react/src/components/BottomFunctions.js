@@ -30,7 +30,8 @@ const BottomFunctions = ({
 
   const onBenchTest = async () => {
     if(!cv) return alert('need cv')
-    await onServerTest().then(()=> onPreTest())
+    await onServerTest()
+        //.then(()=> onPreTest())
 
   }
 
@@ -66,7 +67,7 @@ const BottomFunctions = ({
             }
             const result = JSON.stringify({...res.data, totalTime: Date.now() - start ,preProcessTime: preProcessTime}, null, 1);
             setPreTime(result)
-            clientDetect()
+            //clientDetect()
           })
           .catch((error) => {
             console.log("error", error);
