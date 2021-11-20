@@ -21,10 +21,10 @@ def pre_face_detect(a):
     numpy_img_str = numpy.fromstring(a, numpy.uint8)
     # convert numpy array to image
     img = cv2.imdecode(numpy_img_str, cv2.IMREAD_UNCHANGED)
-    cv2.imwrite('./static/target.jpg', img)
+    cv2.imwrite('./static/target_pre.jpg', img)
 
     # Read the input image
-    img = cv2.imread('./static/target.jpg')
+    img = cv2.imread('./static/target_pre.jpg')
 
     # Convert into grayscale
     # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
