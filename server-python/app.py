@@ -5,6 +5,7 @@ import numpy
 import cv2
 import logging
 import time
+import psutil
 
 app = Flask(__name__)
 api = Api(app)
@@ -40,7 +41,9 @@ def pre_face_detect(a):
 
     detect_time = time.time() - detect_start_time
 
-    return { 'time': detect_time, 'faces': list_str }
+    cpu_p = psutil.cpu_percent()
+
+    return { 'time': detect_time, 'faces': list_str, 'cpu': cpu_p }
 
 def face_detect(a):
     # Log Time
@@ -80,7 +83,9 @@ def face_detect(a):
 
     detect_time = time.time() - detect_start_time
 
-    return { 'time': detect_time, 'faces': list_str }
+    cpu_p = psutil.cpu_percent()
+
+    return { 'time': detect_time, 'faces': list_str, 'cpu': cpu_p }
 
 
 @api.route('/hello')  # 데코레이터 이용, '/hello' 경로에 클래스 등록
@@ -123,6 +128,7 @@ class Detect(Resource):
     def post(self):
 
         time_list = []
+        cpu_list = []
 
         count = request.form['count']
         picture = request.files['file'].read()
@@ -131,17 +137,21 @@ class Detect(Resource):
         for _ in range(int(count)):
             normal_result = face_detect(picture)
             time_list.append(normal_result['time'])
+            cpu_list.append(normal_result['cpu'])
 
         time_avg = numpy.mean(time_list) * 1000
         time_median = numpy.median(time_list) * 1000
+        cpu_avg = numpy.mean(cpu_list)
+        cpu_i = psutil.cpu_count()
 
-        return {'Average': time_avg , 'Median': time_median, 'Url': '/static/detected.jpg'}
+        return {'Average': time_avg , 'Median': time_median, 'Url': '/static/detected.jpg', 'CPUPercent': cpu_avg, 'CPUInfo': cpu_i }
 
 @api.route('/api/detect/face/pre')
 class Detect(Resource):
     def post(self):
 
         time_list = []
+        cpu_list = []
 
         count = request.form['count']
         picture = request.files['file'].read()
@@ -151,11 +161,14 @@ class Detect(Resource):
         for _ in range(int(count)):
             normal_result = pre_face_detect(picture)
             time_list.append(normal_result['time'])
+            cpu_list.append(normal_result['cpu'])
 
         time_avg = numpy.mean(time_list) * 1000
         time_median = numpy.median(time_list) * 1000
+        cpu_avg = numpy.mean(cpu_list)
+        cpu_i = psutil.cpu_count()
 
-        return {'Average': time_avg , 'Median': time_median, 'Faces': faces_result }
+        return {'Average': time_avg , 'Median': time_median, 'Faces': faces_result, 'CPUPercent': cpu_avg, 'CPUInfo': cpu_i }
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
