@@ -30,8 +30,8 @@ const BottomFunctions = ({
 
   const onBenchTest = async () => {
     if(!cv) return alert('need cv')
-    await onServerTest()
-    // await onPreTest()
+    // await onServerTest()
+    await onPreTest()
     // await onServerTest()
     //     .then(()=> onPreTest())
 
